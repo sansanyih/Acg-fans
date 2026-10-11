@@ -1,0 +1,65 @@
+.layout-container {
+   display: flex;
+   flex-direction: column;
+   min-height: 100vh;
+   
+   .fixed-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: var(--bg-page, #fff8f7);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+   }
+   
+   .main-content {
+      margin-top: 80px;
+      padding: 0;
+      background: var(--bg-page, #FFFBFF);
+      flex: 1;
+   }
+   
+   .el-footer {
+      padding: 0;
+      background: #fff;
+   }
+   
+   // 回到顶部按钮样式
+   .backtop-btn {
+      width: 50px;
+      height: 50px;
+      background: #c41e3a;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 12px rgba(196, 30, 58, 0.4);
+      cursor: pointer;
+      transition: all 0.3s;
+      
+      &:hover {
+         transform: translateY(-4px);
+         box-shadow: 0 4px 16px rgba(196, 30, 58, 0.5);
+      }
+      
+      .el-icon {
+         font-size: 20px;
+         margin-bottom: 2px;
+      }
+      
+      .backtop-text {
+         font-size: 10px;
+      }
+   }
+   
+   // 覆盖 el-backtop 默认样式
+   :deep(.el-backtop) {
+      width: auto;
+      height: auto;
+      box-shadow: none;
+      background: transparent;
+   }
+}

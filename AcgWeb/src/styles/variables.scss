@@ -1,0 +1,17 @@
+// 亮色模式（默认）
+:root {
+  // 背景色
+  --bg-page: #fffbff; //页面底层背景
+  --bg-body: #FFFBFF; //主要内容区背景
+  --bg-card: #FFF8F7; //卡片背景
+  
+  // 文字色
+  --text-primary: #333333;  //主标题
+  --text-secondary: #666666; //正文
+  --text-tag: #ffffff; 
+   
+  
+  // 边框/分割线
+  --border-color: #e0e0e0;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}

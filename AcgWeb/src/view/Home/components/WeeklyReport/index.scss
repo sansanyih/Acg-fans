@@ -1,0 +1,57 @@
+.weekly-section {
+   background: #FFFBFF;
+   border-radius: 12px;
+   padding: 40px;
+   width: 300px;
+}
+
+.section-title {
+   font-size: 45px;
+   font-weight: 600;
+   color: #333;
+   margin-bottom: 16px;
+}
+
+.weekly-list {
+   display: flex;
+   flex-direction: column;
+   gap: 12px;
+}
+
+.weekly-item {
+   position: relative;
+   height: 40px;
+   padding: 12px 16px;
+   background: var(--bg-card);
+   box-shadow: var(--shadow);
+   border-radius: 8px;
+   cursor: pointer;
+   transition: all 0.3s;
+   display: flex;
+   align-items: center;
+   gap: 8px;
+
+   &:hover {
+      background: #fff5f5;
+      transform: translateX(-4px);
+   }
+}
+
+.new-tag {
+   display: inline-block;
+   padding: 2px 6px;
+   background: #c41e3a;
+   color: #fff;
+   font-size: 11px;
+   font-weight: bold;
+   border-radius: 4px;
+   flex-shrink: 0;
+}
+
+.weekly-title {
+   font-size: 14px;
+   color: #333;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+}

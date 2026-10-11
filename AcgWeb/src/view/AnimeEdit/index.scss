@@ -1,0 +1,52 @@
+.anime-edit-page {
+   background: var(--bg-page, #fff8f7);
+   min-height: 100vh;
+   padding: 20px 0;
+}
+
+.edit-container {
+   max-width: 1000px;
+   margin: 0 auto;
+   padding: 0 20px;
+}
+
+.edit-header {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   background: #fff;
+   padding: 20px 24px;
+   border-radius: 12px;
+   margin-bottom: 20px;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+   h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #333;
+   }
+}
+
+.edit-form {
+   background: #fff;
+   padding: 24px;
+   border-radius: 12px;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.form-section {
+   margin-bottom: 32px;
+
+   h3 {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+   }
+}
+
+:deep(.el-form-item__label) {
+   font-weight: 500;
+   color: #666;
+}

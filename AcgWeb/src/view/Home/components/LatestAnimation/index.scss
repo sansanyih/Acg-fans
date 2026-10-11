@@ -1,0 +1,99 @@
+.anime-card {
+   margin-bottom: 20px;
+   flex: 0 0 auto;
+   width: 360px;
+   background: var(--bg-card);
+   border-radius: 12px;
+   overflow: hidden;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+   cursor: pointer;
+   &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+   }
+}
+
+.card-image {
+   width: 100%;
+   height: 160px;
+   border-radius: 10px; // 图片容器圆角
+   overflow: hidden;
+
+   .el-image {
+      width: 100%;
+      height: 100%;
+   }
+
+
+   .image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0f0f0;
+      font-size: 48px;
+      font-weight: bold;
+      color: #999;
+   }
+}
+
+.card-text {
+   width: 100%;
+   height: 210px;
+   padding: 15px;
+   display: flex;
+   flex-direction: column;
+
+   .card-title {
+      font-size: 36px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+   }
+
+   .card-desc {
+      font-size: 23px;
+      color: #666;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      flex: 1;
+   }
+}
+
+// 换一批卡片样式
+.refresh-card {
+   height: 400px; // 和其他卡片一样高
+   width: 140px;;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   border: 1px dashed #ddd;
+   background: #fafafa;
+
+   &:hover {
+      border-color: #c41e3a;
+      background: #fff;
+   }
+
+   .refresh-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #666;
+
+      .refresh-icon {
+         font-size: 32px;
+         margin-bottom: 8px;
+      }
+
+      span {
+         font-size: 14px;
+      }
+   }
+}

@@ -1,0 +1,65 @@
+.card-slider {
+  display: flex;
+  flex-direction: column;
+  margin-top: 50px;
+  width: 100%; // 确保占满父级宽度
+
+  .slider-header {
+    margin-bottom: 20px;
+
+    .title {
+      margin-left: 40px;
+      font-size: 60px; 
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  .slider-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: 0 20px;
+    width: 100%;
+    box-sizing: border-box; // 确保 padding 不增加宽度
+
+    .slider {
+      flex: 1;
+      min-width: 0; // 允许 flex item 收缩
+      display: flex;
+      justify-content: flex-start;
+      gap: 1.5rem;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .arrow {
+      width: 45px;
+      height: 45px;
+      // 关键：确保箭头不被压缩
+      flex-shrink: 0;
+      border: none;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: var(--color-primary, #c41e3a);
+        color: var(--color-primary, #c41e3a);
+        transform: scale(1.1);
+      }
+    }
+  }
+}

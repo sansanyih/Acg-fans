@@ -1,0 +1,118 @@
+.footer {
+   width: 100%;
+   padding: 60px 0 30px;
+   background: #fff;
+
+   .quote-section {
+      text-align: center;
+      margin-bottom: 50px;
+
+      .quote-text {
+         font-size: 50px;
+         font-weight: 600;
+         color: #333;
+         margin-bottom: 15px;
+      }
+
+      .quote-sub {
+         font-size: 25px;
+         color: #c41e3a;
+         font-style: italic;
+      }
+   }
+
+   .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      justify-content: space-between;
+      gap: 80px;
+
+      .footer-left {
+         flex: 1;
+
+         .logo {
+            margin-bottom: 20px;
+
+            .logo-main {
+               font-size: 28px;
+               font-weight: 700;
+               color: #c41e3a;
+               margin-right: 10px;
+            }
+
+            .logo-sub {
+               font-size: 14px;
+               color: #c41e3a;
+            }
+         }
+
+         .description {
+            font-size: 24px;
+            line-height: 1.8;
+            color: #666;
+            margin-bottom: 15px;
+         }
+
+         .email {
+            font-size: 24px;
+            color: #666;
+         }
+      }
+
+      .footer-right {
+         display: flex;
+         gap: 60px;
+
+         .link-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+
+            h4 {
+               font-size: 24px;
+               font-weight: 600;
+               color: #333;
+               margin-bottom: 5px;
+            }
+
+            a {
+               font-size: 24px;
+               color: #c41e3a;
+               text-decoration: none;
+
+               &:hover {
+                  text-decoration: underline;
+               }
+            }
+         }
+      }
+   }
+
+   .footer-bottom {
+      max-width: 1200px;
+      margin: 50px auto 0;
+      padding: 20px 40px 0;
+      border-top: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      gap: 30px;
+
+      .copyright {
+         font-size: 24px;
+         color: #333;
+         font-weight: 600;
+      }
+
+      .icp {
+         font-size: 14px;
+         color: #c41e3a;
+         text-decoration: none;
+
+         &:hover {
+            text-decoration: underline;
+         }
+      }
+   }
+}

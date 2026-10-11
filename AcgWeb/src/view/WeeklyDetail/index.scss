@@ -1,0 +1,285 @@
+.weekly-detail-page {
+   background: #f5f5f5;
+   min-height: 100%;
+   padding: 20px 0;
+}
+
+.weekly-container {
+   max-width: 800px;
+   margin: 0 auto;
+   background: #fff;
+   border-radius: 12px;
+   padding: 40px;
+}
+
+.weekly-title {
+   font-size: 28px;
+   font-weight: 600;
+   color: #333;
+   margin-bottom: 20px;
+   line-height: 1.4;
+}
+
+.weekly-meta {
+   display: flex;
+   gap: 20px;
+   color: #666;
+   font-size: 14px;
+   margin-bottom: 20px;
+   padding-bottom: 20px;
+   border-bottom: 1px solid #eee;
+
+   span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+   }
+}
+
+.author-card {
+   display: flex;
+   align-items: center;
+   gap: 15px;
+   padding: 20px;
+   background: #fafafa;
+   border-radius: 8px;
+   margin-bottom: 30px;
+
+   .author-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      overflow: hidden;
+   }
+
+   .avatar-placeholder {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #c41e3a;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+   }
+
+   .author-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+   }
+
+   .author-bio {
+      font-size: 14px;
+      color: #666;
+   }
+}
+
+.weekly-content {
+   font-size: 16px;
+   line-height: 1.8;
+   color: #333;
+   margin-bottom: 40px;
+
+   p {
+      margin-bottom: 16px;
+      text-indent: 2em;
+   }
+}
+
+// 评论区样式
+.comment-section {
+   background: #fff8f8;
+   border-radius: 12px;
+   padding: 20px;
+   margin-top: 40px;
+}
+
+.section-header {
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   font-size: 18px;
+   font-weight: 600;
+   color: #333;
+   margin-bottom: 20px;
+   padding-bottom: 10px;
+   border-bottom: 2px solid #c41e3a;
+
+   .el-icon {
+      color: #c41e3a;
+      font-size: 20px;
+   }
+}
+
+// 未登录提示
+.login-prompt {
+   text-align: center;
+   padding: 40px 0;
+
+   .login-btn {
+      padding: 12px 30px;
+      font-size: 16px;
+      border-radius: 20px;
+      background: #c41e3a;
+      border-color: #c41e3a;
+
+      &:hover {
+         background: #a01830;
+         border-color: #a01830;
+      }
+   }
+}
+
+// 已登录输入区
+.comment-input-wrapper {
+   .current-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+
+      .user-avatar {
+         width: 40px;
+         height: 40px;
+         border-radius: 50%;
+         overflow: hidden;
+      }
+
+      .avatar-placeholder {
+         width: 40px;
+         height: 40px;
+         border-radius: 50%;
+         background: #c41e3a;
+         color: #fff;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         font-size: 16px;
+      }
+
+      .username {
+         font-size: 16px;
+         font-weight: 600;
+         color: #333;
+      }
+   }
+
+   .comment-textarea {
+      margin-bottom: 15px;
+
+      :deep(.el-textarea__inner) {
+         background: #fff;
+         border-radius: 8px;
+         resize: none;
+      }
+   }
+
+   .comment-actions {
+      display: flex;
+      gap: 10px;
+
+      .el-button {
+         border-radius: 20px;
+      }
+
+      .el-button--primary {
+         background: #c41e3a;
+         border-color: #c41e3a;
+
+         &:hover {
+            background: #a01830;
+            border-color: #a01830;
+         }
+      }
+   }
+}
+
+// 评论列表
+.comment-list {
+   margin-top: 30px;
+   display: flex;
+   flex-direction: column;
+   gap: 15px;
+}
+
+.comment-item {
+   background: #fff;
+   border-radius: 8px;
+   padding: 15px;
+   border: 1px solid #eee;
+
+   &.author-reply {
+      background: #fce4ec;
+   }
+}
+
+.comment-header {
+   display: flex;
+   align-items: center;
+   gap: 12px;
+   margin-bottom: 12px;
+
+   .comment-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+   }
+
+   .avatar-placeholder {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #c41e3a;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+   }
+
+   .comment-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .username {
+         font-size: 16px;
+         font-weight: 600;
+         color: #333;
+      }
+
+      .level {
+         padding: 2px 6px;
+         background: #4caf50;
+         color: #fff;
+         font-size: 11px;
+         border-radius: 4px;
+      }
+   }
+}
+
+.comment-content {
+   font-size: 15px;
+   line-height: 1.6;
+   color: #333;
+   margin-bottom: 12px;
+}
+
+.comment-footer {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+
+   .date {
+      font-size: 13px;
+      color: #999;
+   }
+
+   .el-button {
+      border-radius: 4px;
+   }
+}

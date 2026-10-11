@@ -1,0 +1,149 @@
+// ==================== Header 主容器 ====================
+.header {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+  padding: 0 40px;
+  background-color: #FFF8F7;
+
+  // 左侧区域
+  .header-lf {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+  }
+
+  // 右侧区域
+  .header-ri {
+    display: flex;
+    align-items: center;
+  }
+}
+
+// ==================== Icon 组件样式 ====================
+.site-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .logo-placeholder {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    background: #ffb2be;
+  }
+
+  .site-name {
+    font-size: 28px;
+    color: #ffb2be;
+    font-weight: 600;
+  }
+}
+
+// ==================== Tab 组件样式 ====================
+.tab-list {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .tab-item {
+    position: relative;
+    padding: 0 35px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    overflow: hidden;
+
+    .tab-text {
+      font-size: 18px;
+      color: #9b9b9b;
+      transition: color 0.3s;
+      z-index: 1;
+      position: relative;
+    }
+
+    // 点击遮罩效果
+    .tab-ripple {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      opacity: 0;
+      transform: scale(0.8);
+      pointer-events: none;
+    }
+
+    &:active .tab-ripple {
+      animation: ripple-effect 0.4s ease-out;
+    }
+
+    &.active .tab-text {
+      color: #ffb2be;
+      font-weight: 500;
+    }
+  }
+
+  // 滑动下划线
+  .tab-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: #ffb2be;
+    transition: all 0.3s ease;
+  }
+}
+
+// 遮罩动画：圆角 → 直角
+@keyframes ripple-effect {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+    border-radius: 12px;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+    border-radius: 0;
+  }
+}
+
+// ==================== Button 组件样式 ====================
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  font-size: 30px;
+  color: #fff;
+  .action-button{
+    width: 3rem;
+    height: 3rem;
+    border: none;
+    border-radius: 50%; 
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.5s; 
+    &:hover{
+      background: rgba(255, 178, 190, 0.15);
+    }
+    .action-icon {
+      color:#bc004b;
+      width: 2em;
+      height: 2em;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+  }
+}
+
