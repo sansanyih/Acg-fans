@@ -62,8 +62,14 @@ ACG-Web/
 
 ### 0. 准备数据库
 
-本地启动 MySQL 8，然后**不用手动建库**——JDBC URL 带了 `createDatabaseIfNotExist=true`，
-建表脚本和种子数据由 Spring 在启动时自动执行（`spring.sql.init`）。
+本地启动 MySQL 8，然后**不用手动建库建表**：
+
+- JDBC URL 带了 `createDatabaseIfNotExist=true`，**库不存在会自动创建**；
+- 建表脚本与种子数据放在 `AcgData/src/main/resources/db/{schema,data}/`，
+  由 Spring 的 `spring.sql.init` 在后端启动时按文件名顺序执行。
+
+**所有表都建在 `acg_fans` 库里**（即 `localhost:3306` 这台 MySQL 上的 `acg_fans` schema），
+完整的表清单见下文 [《数据库设计》](#4-数据库设计16-张表)。
 
 默认连接：`localhost:3306`，用户名 `root`，密码 `123456`。
 如需修改，改 `AcgData/src/main/resources/application.yml`，或用环境变量覆盖：
@@ -72,6 +78,17 @@ ACG-Web/
 export MYSQL_USERNAME=root
 export MYSQL_PASSWORD=你的密码
 ```
+
+> **在 Navicat / DBeaver 里看不到表？**
+>
+> 1. **数据库列表是缓存过的**：`acg_fans` 是后端首次启动时才创建的，需要刷新连接
+>    （Navicat 右键连接 → 刷新，或按 `F5`）。它按字母序排在 `information_schema` **之前**，
+>    刷新后会出现在列表最上面；
+> 2. 图形工具里的「记录数」列对 InnoDB 只是**估算值**（经常显示 0），不要据此判断表是空的，
+>    用 `SELECT COUNT(*)` 才准确。
+>
+> 想重建数据：`DROP DATABASE acg_fans;` 之后重启后端即可。脚本都是
+> `CREATE TABLE IF NOT EXISTS` + `INSERT ... ON DUPLICATE KEY UPDATE`，**重复启动不会报错、也不会重复插入**。
 
 ### 1. 启动后端（先启动，前端要靠它拿数据）
 
@@ -198,6 +215,29 @@ HTTP → JwtAuthenticationFilter（解析 Token 写入 SecurityContext）
 - 分页插件 `PaginationInnerInterceptor` 限制单页最大 100 条，另开启乐观锁插件（`@Version` 可用）；
 - 建表与种子数据放在 `db/schema/*.sql`、`db/data/*.sql`，由 `spring.sql.init` 启动执行，
   全部 `CREATE TABLE IF NOT EXISTS` + `INSERT ... ON DUPLICATE KEY UPDATE`，**可重复启动、幂等**。
+
+#### 全新启动后的种子数据条数
+
+| 表 | 条数 | 表 | 条数 |
+| --- | --- | --- | --- |
+| `anime` | 18 | `anime_rating` | 36 |
+| `anime_tag` | 72 | `tag` | 40 |
+| `article` | 4 | `video` | 12 |
+| `character` | 6 | `feed` | 9 |
+| `announcement` | 6 | `weekly_report` | 6 |
+| `carousel` | 3 | `link` | 12 |
+| `user` | 8 | `edit_statistic` | 120 |
+| `comment` | 0 | `like_record` | 0 |
+
+几点说明：
+
+- `comment` / `like_record` 初始为空是**有意为之**：用户数据由 `DataInitializer` 在后端启动时创建，
+  晚于 SQL 初始化脚本，脚本阶段无法建立评论与用户的关联。这两张表的数据需要登录后在页面上
+  真实评论 / 点赞才会产生；
+- `edit_statistic` 的 120 条 = 最近 30 天 × 4 种类型，由 `DataInitializer` 生成（固定随机种子，结果可复现）；
+- `user` 的 8 条是演示账号，密码统一 `BCryptPasswordEncoder` 加密后入库；
+- 跑集成测试（`./gradlew test`）会额外注册一个 `e2e_tester` 测试账号、并产生若干条已逻辑删除的
+  `article` / `link` 记录（删除用例的痕迹），属正常现象，`deleted = 0` 查不到它们。
 
 ### 5. 接口一览（70+）
 
