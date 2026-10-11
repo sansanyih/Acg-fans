@@ -1,72 +1,59 @@
 package com.example.acgdata.controller;
 
-import org.springframework.web.bind.annotation.*;
+import com.example.acgdata.common.Result;
+import com.example.acgdata.dto.LinkSaveDTO;
+import com.example.acgdata.service.LinkService;
+import com.example.acgdata.vo.LinkVO;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
+/**
+ * 友情链接接口。
+ * 路径与返回结构与旧接口保持一致，只在最外层加了一层 Result。
+ */
 @RestController
 @RequestMapping("/api/links")
-@CrossOrigin(origins = "*")
+@RequiredArgsConstructor
+@Validated
 public class LinkController {
 
-    private List<Map<String, Object>> linkList = new ArrayList<>();
-
-    public LinkController() {
-        // 初始化示例数据
-        List<Map<String, Object>> initLinks = Arrays.asList(
-                Map.of("id", 1, "name", "Bangumi番组计划", "url", "https://jsd.onmicrosoft.cn/gh/sansanyih/tuchuang@main/img/bangumi.png", "link", "https://chii.in"),
-                Map.of("id", 2, "name", "WebGAL", "url", "https://webgal.ink", "link", "https://webgal.ink"),
-                Map.of("id", 3, "name", "HumiHumi", "url", "https://humihumi.org", "link", "https://humihumi.org"),
-                Map.of("id", 4, "name", "末语引擎", "url", "https://moyu.moe", "link", "https://moyu.moe"),
-                Map.of("id", 5, "name", "Nanovel(中文站)", "url", "https://nanovel.net", "link", "https://nanovel.net"),
-                Map.of("id", 6, "name", "NGAVG", "url", "https://ngavg.org", "link", "https://ngavg.org"),
-                Map.of("id", 7, "name", "Lovestory Project", "url", "https://lsp.moe", "link", "https://lsp.moe"),
-                Map.of("id", 8, "name", "月幕GalGame", "url", "https://tsukimi.moe", "link", "https://tsukimi.moe"),
-                Map.of("id", 9, "name", "Steam上的中文Galgame", "url", "https://store.steampowered.com", "link", "https://store.steampowered.com"),
-                Map.of("id", 10, "name", "豆津账本", "url", "https://doujin.moe", "link", "https://doujin.moe"),
-                Map.of("id", 11, "name", "123制作组", "url", "#", "link", "#"),
-                Map.of("id", 12, "name", "花舞导航", "url", "#", "link", "#")
-        );
-        linkList.addAll(initLinks);
-    }
+    private final LinkService linkService;
 
     @GetMapping("/get")
-    public List<Map<String, Object>> getLinks() {
-        return linkList;
+    public Result<List<LinkVO>> getLinks() {
+        return Result.ok(linkService.listAll());
     }
 
     @GetMapping("/get/{id}")
-    public Map<String, Object> getLinkById(@PathVariable int id) {
-        return linkList.stream()
-                .filter(link -> (int) link.get("id") == id)
-                .findFirst()
-                .orElse(null);
+    public Result<LinkVO> getLinkById(@PathVariable Long id) {
+        return Result.ok(linkService.getVO(id));
     }
 
     @PostMapping("/insert")
-    public Map<String, Object> addLink(@RequestBody Map<String, Object> linkData) {
-        Map<String, Object> newLink = new HashMap<>(linkData);
-        newLink.put("id", linkList.size() + 1);
-        linkList.add(newLink);
-        return newLink;
+    public Result<LinkVO> insert(@Valid @RequestBody LinkSaveDTO dto) {
+        return Result.ok("新增成功", linkService.saveLink(dto));
     }
 
     @PutMapping("/update/{id}")
-    public Map<String, Object> updateLink(@PathVariable int id, @RequestBody Map<String, Object> linkData) {
-        for (Map<String, Object> link : linkList) {
-            if ((int) link.get("id") == id) {
-                link.putAll(linkData);
-                return link;
-            }
-        }
-        return null;
+    public Result<LinkVO> update(@PathVariable Long id, @Valid @RequestBody LinkSaveDTO dto) {
+        return Result.ok("修改成功", linkService.updateLink(id, dto));
     }
 
     @DeleteMapping("/delete/{id}")
-    public Map<String, String> deleteLink(@PathVariable int id) {
-        Map<String, String> response = new HashMap<>();
-        boolean removed = linkList.removeIf(link -> (int) link.get("id") == id);
-        response.put("status", removed ? "success" : "error");
-        return response;
+    public Result<Map<String, String>> delete(@PathVariable Long id) {
+        linkService.removeLink(id);
+        return Result.ok(Map.of("status", "success"));
     }
 }

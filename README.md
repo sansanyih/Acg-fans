@@ -1,8 +1,10 @@
 # Acg-fans
 
-一个 ACG（动画 / 漫画 / 游戏）内容站点，由 **前台展示站**、**后台管理系统** 和 **后端接口服务** 三部分组成，放在同一个仓库里统一维护。
+一个 ACG（动画 / 漫画 / 游戏）内容社区，包含 **前台展示站**、**后台管理系统** 和 **后端 API 服务** 三个部分，放在同一个仓库里维护。
 
-> 当前后端数据全部为**内存里的模拟数据**（没有接数据库），重启即还原，属于演示 / 联调阶段的项目。
+后端已从"Controller 里塞内存假数据"重构为 **Controller → Service → Mapper → MySQL** 的正规分层：
+Spring Boot 4.1.1 GA + MyBatis-Plus + MySQL 8 + Spring Security/JWT，**16 张业务表、70+ REST 接口**，
+统一响应体、全局异常、参数校验、分页、逻辑删除、BCrypt 密码、基于角色的接口鉴权全部落地。
 
 ---
 
@@ -10,37 +12,34 @@
 
 ```
 ACG-Web/
-├── AcgWeb/                       # 前台展示站（Vue 3 + Vite）
-│   ├── src/
-│   │   ├── api/                  # 接口层：axios 封装 + 按业务拆分的模块
-│   │   ├── routers/              # 路由：自动扫描 modules/*.ts
-│   │   ├── view/                 # 页面：Home / AnimeDetail / ArticleDetail / ...
-│   │   ├── components/           # 通用组件：ComicCard / ContentCardSlider / DiscussCard
-│   │   ├── layout/               # 布局：Header / Footer
-│   │   ├── stores/               # Pinia 状态：user / theme
-│   │   ├── styles/               # 全局样式：reset / common / variables
-│   │   └── utils/                # 工具：getEnv / format / judge / scrollTables
-│   ├── e2e/                      # Playwright 端到端测试
-│   ├── public/                   # 静态资源
-│   ├── .env                      # 本地环境变量（已被 .gitignore 忽略，需自行创建）
-│   └── vite.config.ts            # 别名 @ → src、SCSS 变量注入、/api 代理
+├── AcgWeb/                       # 前台展示站（Vue 3 + Vite + TS）
+│   ├── src/api/                  # 接口层：Axios 封装 + 按业务拆分的模块
+│   ├── src/routers/              # 路由：import.meta.glob 自动注册 + keep-alive
+│   ├── src/view/                 # 页面（首页 / 番剧 / 文章 / 视频 / 周报 / 讨论 / 搜索 / 登录）
+│   ├── src/components/           # 通用组件
+│   ├── src/layout/               # Header / Footer 布局
+│   ├── src/stores/               # Pinia：user / theme
+│   └── vite.config.ts            # 别名 @、SCSS 变量注入、/api 代理
 │
-├── Acg_admin/                    # 后台管理系统
-│   ├── Acg_admin/                # ★ 真正的后台应用在这里（嵌套一层）
-│   │   ├── src/api/              # axios 实例 + anime / article / user / video
-│   │   ├── src/views/            # Login / Home / anime|article|video|user 的增删改查页
-│   │   ├── src/components/layout/# 后台整体布局
-│   │   └── src/router/index.ts   # 路由 + token 路由守卫
-│   └── package.json              # 仅声明 echarts / vue-echarts（残留文件）
+├── Acg_admin/Acg_admin/          # 后台管理系统（Vue 3 + Vite + TS）
+│   └── src/                      # 番剧 / 文章 / 视频 / 用户的增删改查 + 登录
 │
-├── AcgData/                      # 后端接口服务（Spring Boot）
-│   ├── src/main/java/com/example/acgdata/
-│   │   ├── AcgDataApplication.java
-│   │   ├── config/               # CorsConfig（全站放开跨域）、WebConfig
-│   │   ├── controller/           # 12 个 REST 控制器
-│   │   └── service/              # EditStatisticsService（编辑统计）
-│   ├── src/main/resources/application.properties   # 端口 8080
-│   └── build.gradle
+├── AcgData/                      # 后端 API（Spring Boot 4.1.1）
+│   ├── REFACTOR_GUIDE.md         # 本次重构的分层 / 接口 / 数据库约定
+│   └── src/main/
+│       ├── java/com/example/acgdata/
+│       │   ├── common/           # Result、PageResult、业务异常、全局异常处理
+│       │   ├── config/           # MyBatis-Plus、CORS、公共字段自动填充、演示数据初始化
+│       │   ├── security/         # JWT 工具、认证过滤器、权限配置
+│       │   ├── entity/           # 数据库实体（16 张表）
+│       │   ├── mapper/           # MyBatis-Plus Mapper + 注解 SQL
+│       │   ├── service(/impl)/   # 业务层（IService / ServiceImpl）
+│       │   ├── controller/       # 只做参数校验与转发
+│       │   ├── dto/ vo/          # 入参 / 出参对象
+│       │   └── ...
+│       └── resources/
+│           ├── application.yml
+│           └── db/{schema,data}/ # 建表脚本与幂等种子数据（spring.sql.init 执行）
 │
 ├── .gitignore
 └── README.md
@@ -50,15 +49,29 @@ ACG-Web/
 
 ## 技术栈
 
-| 模块 | 技术 |
+| 层次 | 技术 |
 | --- | --- |
-| `AcgWeb`（前台） | Vue 3.5、Vite 7、TypeScript 5.9、Vue Router 5、Pinia 3、Element Plus 2、ECharts 6、Axios、Sass；质量工具 oxlint + ESLint + Prettier + Vitest + Playwright |
-| `Acg_admin`（后台） | Vue 3.5、Vite 8、TypeScript 6、Vue Router 5、Pinia 3、Element Plus 2、Axios、vue-echarts |
-| `AcgData`（后端） | Java 17、Spring Boot 4.0.0-M1、Spring Web、Gradle Wrapper |
+| 前台 | Vue 3.5、Vite 7、TypeScript 5.9、Vue Router 5、Pinia 3、Element Plus 2、ECharts 6、Axios、Sass、Vitest、Playwright、oxlint/ESLint/Prettier |
+| 后台 | Vue 3.5、Vite 8、TypeScript 6、Vue Router 5、Pinia 3、Element Plus 2、vue-echarts |
+| 后端 | Java 17、Spring Boot 4.1.1 GA、MyBatis-Plus 3.5.17、MySQL 8、Spring Security、JWT（jjwt 0.13.0）、HikariCP、Lombok、Jakarta Validation、Gradle |
+| 数据库 | MySQL 8（库名 `acg_fans`，16 张业务表，脚本化建表 + 幂等种子数据） |
 
 ---
 
 ## 快速开始
+
+### 0. 准备数据库
+
+本地启动 MySQL 8，然后**不用手动建库**——JDBC URL 带了 `createDatabaseIfNotExist=true`，
+建表脚本和种子数据由 Spring 在启动时自动执行（`spring.sql.init`）。
+
+默认连接：`localhost:3306`，用户名 `root`，密码 `123456`。
+如需修改，改 `AcgData/src/main/resources/application.yml`，或用环境变量覆盖：
+
+```bash
+export MYSQL_USERNAME=root
+export MYSQL_PASSWORD=你的密码
+```
 
 ### 1. 启动后端（先启动，前端要靠它拿数据）
 
@@ -67,7 +80,8 @@ cd AcgData
 ./gradlew bootRun          # Windows: .\gradlew.bat bootRun
 ```
 
-启动后地址：`http://localhost:8080`，所有接口前缀均为 `/api`。
+启动后：`http://localhost:8080`，所有接口前缀 `/api`。
+首次启动会自动建表、灌入演示数据，并创建演示账号（密码统一 BCrypt 加密后入库）。
 
 ### 2. 启动前台展示站
 
@@ -77,7 +91,13 @@ npm install
 npm run dev
 ```
 
-默认 `http://localhost:5173`。开发服务器的代理规则是：请求 `/api/**` → `http://localhost:8080`，所以前端代码里只写 `/api/...`，不用关心后端地址。
+默认 `http://localhost:5173`。开发服务器把 `/api/**` 代理到 `http://localhost:8080`。
+需要 `.env`（已被 git 忽略，克隆后自行创建）：
+
+```ini
+VITE_API_BASE_URL=/api
+VITE_PROXY_TARGET=http://localhost:8080
+```
 
 ### 3. 启动后台管理
 
@@ -87,169 +107,168 @@ npm install
 npm run dev
 ```
 
----
+### 演示账号
 
-## AcgWeb · 前台展示站
-
-### 页面路由
-
-| 路径 | 名称 | 说明 |
+| 账号 | 密码 | 角色 |
 | --- | --- | --- |
-| `/` → `/home` | Home | 首页，聚合下面所有栏目 |
-| `/anime/:id` | AnimeDetail | 番剧详情（简介、制作信息、角色、评分、评论） |
-| `/anime/edit/:id` · `/anime/add` | AnimeEdit / AnimeAdd | 番剧编辑 / 新增 |
-| `/articles/index/:id` | ArticleDetail | 文章详情 |
-| `/article/add` | ArticleAdd | 发布文章 |
-| `/video/:id` · `/video/add` | VideoDetail / VideoAdd | 视频详情 / 投稿 |
-| `/weekly/:id` | WeeklyDetail | 周报详情 |
-| `/discuss` | Discuss | 讨论区 |
-| `/share` | Share | 分享 |
-| `/search` | Search | 全站搜索 |
-| `/login` | Login | 登录 / 注册 |
+| `admin` | `admin123` | 管理员（可改删，能进后台） |
+| `咕噜咕噜` | `123456` | 普通用户（可评论、点赞、投稿） |
 
-首页由这些区块组件拼装而成：轮播 `Carousel`、最新番剧 `LatestAnimation`、即将上线 `UpcomingAnimation`、随机推荐 `RandomRecommend`、最新视频 `LatestVideo`、最新文章 `LatesArticles`、最新动态 `LatestFeed`、周报 `WeeklyReport`、角色生日 `CharacterBirthday`、编辑动态 `RecentEdit`、公告 `AnnouncementSection`、友情链接 `CommunityLinks`。
-
-### 接口层约定
-
-`src/api/index.ts` 导出一个 `HttpClient` 单例（`http`）：
-
-- `baseURL` 取 `import.meta.env.VITE_API_BASE_URL`，超时 10s；
-- 请求拦截器自动从 `localStorage.token` 注入 `Authorization: Bearer <token>`，并用 `AxiosCanceler` 对同一请求做去重 / 取消；
-- 响应拦截器直接返回 `response.data`，401 会清 token 并跳 `/login`，403 / 404 / 500 在控制台给出提示。
-
-业务接口按模块拆分在 `src/api/modules/<模块>/`，每个模块固定三个文件：
-
-```
-index.ts        // 具体请求函数
-interface.ts    // 请求 / 响应类型
-urls.const.ts   // 接口地址常量
-```
-
-现有模块：`anime`、`article`、`video`、`carousel`、`character`、`announcement`、`weekly`、`feed`、`tag`、`rating`、`statistics`、`user`、`links`、`search`。
-
-### 路由与状态
-
-- `routers/router.ts` 用 `import.meta.glob('./modules/*.ts', { eager: true })` 自动收集 `routers/modules/` 下的路由，新增页面只需加一个模块文件；
-- `routers/cacheRouter.ts` 依据 `meta.keepAlive` + `meta.name` 生成 keep-alive 缓存列表；
-- `stores/user.ts` 用 Pinia 保存 `token` 与 `userInfo`（持久化到 localStorage）。
-
-### 环境变量
-
-`AcgWeb/.env`（已被 `.gitignore` 忽略，克隆后需自行创建）：
-
-```ini
-VITE_API_BASE_URL=/api                    # 前端请求前缀，同时作为代理匹配路径
-VITE_PROXY_TARGET=http://localhost:8080   # 后端地址
-# 可选：VITE_PORT / VITE_OPEN
-```
-
-`src/utils/getEnv.ts` 的 `wrapperEnv()` 会把变量转成正确类型后交给 `vite.config.ts`。
-
-### 常用脚本
-
-| 命令 | 作用 |
-| --- | --- |
-| `npm run dev` | 启动开发服务器（监听 `0.0.0.0`） |
-| `npm run build` | 类型检查 + 生产构建 |
-| `npm run preview` | 预览构建产物 |
-| `npm run test:unit` | Vitest 单元测试 |
-| `npm run test:e2e` | Playwright 端到端测试 |
-| `npm run lint` | oxlint + ESLint 自动修复 |
-| `npm run format` | Prettier 格式化 `src/` |
+其余演示用户见 `config/DataInitializer.java`（`动漫评论家 / password123`、`JOJO粉 / jojo123` 等）。
 
 ---
 
-## AcgData · 后端接口服务
+## 后端设计（AcgData）
 
-Spring Boot 应用，端口 `8080`，控制器统一以 `/api` 开头；`CorsConfig` 通过 `CorsFilter` 放开了全部来源、方法和请求头（便于本地联调）。
+### 1. 分层与职责
 
-### 接口一览
+| 层 | 职责 | 约定 |
+| --- | --- | --- |
+| `controller` | 参数校验、调用 Service、包装 `Result` | 不写业务逻辑、不出现 `List<Map<String,Object>>`、不直接调 Mapper |
+| `service` / `service.impl` | 业务编排、事务、DTO/VO 转换 | 统一继承 `IService<T>` / `ServiceImpl<Mapper, T>` |
+| `mapper` | 数据访问 | 继承 `BaseMapper<T>`，复杂查询用注解 SQL |
+| `entity` | 表映射 | 蛇形列名 ↔ 驼峰属性，`@TableLogic` 逻辑删除 |
+| `dto` / `vo` | 入参 / 出参 | 入参带 Jakarta Validation 注解；VO 负责对齐前端字段名与时间格式 |
+
+典型请求链路：
+
+```
+HTTP → JwtAuthenticationFilter（解析 Token 写入 SecurityContext）
+     → SecurityFilterChain（按 HTTP 方法 + 路径做鉴权）
+     → Controller（@Valid 校验 DTO，转发）
+     → Service（业务校验、装配 VO、@Transactional）
+     → Mapper / MyBatis-Plus（分页插件、逻辑删除、自动填充）
+     → MySQL
+     → Result<T> 统一响应体
+```
+
+### 2. 统一响应体、异常与校验
+
+所有接口返回同一结构，前端只需判断 `code`：
+
+```json
+{ "code": 200, "message": "操作成功", "data": {}, "success": true }
+```
+
+- `ResultCode` 统一维护状态码字典（200 成功、400 参数错误、401 未登录、403 无权限、404/405、1xxx 业务语义错误）；
+- 业务代码直接 `throw new BusinessException(ResultCode.XXX)`，由 `@RestControllerAdvice` 收敛成统一响应体，
+  并分别处理 `MethodArgumentNotValidException`、`BindException`、`ConstraintViolationException`、
+  `HttpMessageNotReadableException`、`HttpRequestMethodNotSupportedException` 与兜底 `Exception`（打完整堆栈，但不外泄细节）；
+- 入参一律 DTO + `@Valid`，例如 `LinkSaveDTO`、`AnimeSaveDTO`；
+- 分页统一走 `PageResult<T>`（`total / pages / current / size / records`），不把 MyBatis-Plus 的 `Page` 直接抛给前端。
+
+### 3. 鉴权与权限模型
+
+- 登录 `POST /api/user/login` 校验 BCrypt 密码（`PasswordEncoder.matches`），签发 **JWT（HS256，默认 12 小时）**，
+  载荷只放 `userId / username / admin`；
+- `JwtAuthenticationFilter`（`OncePerRequestFilter`）解析 `Authorization: Bearer <token>`，
+  校验签名与过期时间后写入 `SecurityContext`；Token 非法/过期不抛异常，最终由 `authenticationEntryPoint` 返回 401；
+- 全程 **无状态**（`SessionCreationPolicy.STATELESS`），不依赖 Session；
+- 权限规则集中配置在 `SecurityConfig`：
+
+| 请求 | 要求 |
+| --- | --- |
+| `POST /api/user/login`、`/register` | 公开 |
+| 所有 `GET /api/**` | 公开（`GET /api/user/get/all` 例外，需管理员） |
+| `POST /api/*/like|dislike|addComment|view/**` | 需登录 |
+| `POST /api/*/insert` | 需登录 |
+| `PUT /api/*/update/**`、`DELETE /api/*/delete/**` | 需管理员（`hasRole("ADMIN")`） |
+
+- 401 / 403 也返回统一响应体（由 `authenticationEntryPoint` / `accessDeniedHandler` 写出 JSON）；
+- 密码字段用 `@JsonProperty(access = WRITE_ONLY)` + 专用 VO 双重保证**永不返回给前端**。
+
+### 4. 数据库设计（16 张表）
+
+| 分类 | 表 | 说明 |
+| --- | --- | --- |
+| 用户 | `user` | BCrypt 密码、等级、发帖/评论计数 |
+| 内容 | `anime`、`article`、`video`、`character`、`announcement`、`weekly_report`、`feed`、`carousel`、`link` | 番剧 / 文章 / 视频 / 角色 / 公告 / 周报 / 动态 / 轮播 / 友链 |
+| 关系 | `tag`、`anime_tag` | 标签字典 + 番剧标签多对多 |
+| 交互 | `comment`、`like_record`、`anime_rating` | 多态评论、点赞记录、番剧评分（多维度） |
+| 统计 | `edit_statistic` | 按「日期 + 类型」聚合的编辑统计 |
+
+约定：
+
+- 每张业务表统一带 `create_time` / `update_time` / `deleted`（逻辑删除），
+  时间字段由 `MetaObjectHandler` 自动填充，业务代码不手写；
+- 点赞数、浏览量采用**冗余计数列 + 原子自增**（`like_count = like_count + 1`），避免列表页聚合查询；
+- `like_record` 用唯一索引 `(target_type, target_id, user_id)` 防重复点赞，并发重复插入触发
+  `DuplicateKeyException` 后转换成友好业务异常；该表**物理删除**（取消点赞即删记录），
+  避免"逻辑删除 + 唯一索引"在反复点赞/取消时主键冲突；`anime_tag` 同理；
+- 分页插件 `PaginationInnerInterceptor` 限制单页最大 100 条，另开启乐观锁插件（`@Version` 可用）；
+- 建表与种子数据放在 `db/schema/*.sql`、`db/data/*.sql`，由 `spring.sql.init` 启动执行，
+  全部 `CREATE TABLE IF NOT EXISTS` + `INSERT ... ON DUPLICATE KEY UPDATE`，**可重复启动、幂等**。
+
+### 5. 接口一览（70+）
 
 | 模块 | 前缀 | 主要接口 |
 | --- | --- | --- |
-| 番剧 | `/api/anime` | `GET /get`、`GET /get/{id}`、`GET /get/latest`、`GET /get/upcoming`、`GET /get/random`、`GET /get/random-tag`、`GET /get/random-ratings`、`GET /get/recent-updated`、`GET /search`、`POST /insert`、`PUT /update/{id}`、`DELETE /delete/{id}`、`POST /addComment/{id}` |
-| 文章 | `/api/article` | `GET /get`、`GET /get/{id}`、`GET /search`、`POST /insert`、`PUT /update/{id}`、`DELETE /delete/{id}`、`POST /addComment/{id}`、`POST /like/{id}`、`POST /view/{id}` |
-| 视频 | `/api/video` | `GET /get`、`GET /get/{id}`、`GET /search`、`POST /insert`、`PUT /update/{id}`、`DELETE /delete/{id}`、`POST /addComment/{id}` |
-| 角色 | `/api/character` | `GET /get`、`GET /get/{id}`、`GET /getByAnime/{animeId}`、`GET /search`、`POST /insert`、`PUT /update/{id}`、`DELETE /delete/{id}`、`POST /like/{id}`、`POST /dislike/{id}` |
-| 公告 | `/api/announcement` | `GET /get`、`GET /get/{id}`、`POST /insert`、`PUT /update/{id}`、`DELETE /delete/{id}`、`POST /addComment/{id}`、`POST /like/{id}` |
+| 番剧 | `/api/anime` | `GET /get`、`/get/{id}`、`/get/random`、`/get/latest`、`/get/upcoming`、`/get/recent-updated`、`/get/random-tag`、`/get/random-ratings`、`/search`；`POST /insert`、`/addComment/{id}`；`PUT /update/{id}`；`DELETE /delete/{id}` |
+| 文章 | `/api/article` | `GET /get`、`/get/{id}`、`/page`（分页 + 关键字条件查询）、`/search`；`POST /insert`、`/addComment/{id}`、`/like/{id}`、`/view/{id}`；`PUT`、`DELETE` |
+| 视频 | `/api/video` | `GET /get`、`/get/{id}`、`/search`；`POST /insert`、`/addComment/{id}`；`PUT`、`DELETE` |
+| 角色 | `/api/character` | `GET /get`、`/get/{id}`、`/getByAnime/{animeId}`、`/search`；`POST /insert`、`/like/{id}`、`/dislike/{id}`；`PUT`、`DELETE` |
+| 公告 | `/api/announcement` | `GET /get`、`/get/{id}`；`POST /insert`、`/addComment/{id}`、`/like/{id}`；`PUT`、`DELETE` |
 | 周报 | `/api/weekly` | 同公告 |
-| 轮播 | `/api/carousel` | `GET /get`、`GET /get/{id}`、`POST /insert`、`PUT /update/{id}`、`DELETE /delete/{id}` |
-| 友情链接 | `/api/links` | 同轮播 |
-| 动态 | `/api/feed` | `GET /get`、`GET /get/{id}`、`GET /search`、`POST /insert`、`PUT /update/{id}`、`DELETE /delete/{id}` |
-| 用户 | `/api/user` | `POST /login`、`POST /register`、`GET /get/{id}`、`GET /get/all` |
-| 编辑统计 | `/api/statistics` | `GET /edits`、`GET /edits/range`、`GET /edits/recent` |
-| 全站搜索 | `/api/search` | `GET /api/search/all` |
+| 动态 | `/api/feed` | `GET /get`、`/get/{id}`、`/search`；`POST /insert`；`PUT`、`DELETE` |
+| 轮播 | `/api/carousel` | `GET /get`、`/get/{id}`；`POST /insert`；`PUT`、`DELETE` |
+| 友链 | `/api/links` | 同轮播 |
+| 用户 | `/api/user` | `POST /login`、`/register`；`GET /get/{id}`、`/get/all`（管理员） |
+| 统计 | `/api/statistics` | `GET /edits`、`/edits/range`、`/edits/recent` |
+| 搜索 | `/api/search` | `GET /all?keyword=`（聚合四个模块，带 `type` 判别字段） |
 
-### 数据说明（重要）
+### 6. 测试
 
-- 所有数据都写在控制器的 `List<Map<String, Object>>` / 静态 `Map` 里（例如 `AnimeController.initAnimeData()`、`EditStatisticsService` 的模拟统计），**没有持久化层**；
-- 新增 / 修改 / 删除只在当前进程内生效，重启服务后回到初始模拟数据；
-- 内置管理员账号：`admin` / `admin123`；
-- `POST /api/user/login` 只返回用户信息，**不签发真正的 token**，前端的 token 是拼接出来的（见下方「已知限制」）。
+`src/test/java` 下有基于真实 MySQL 的集成测试：
 
-### 常用命令
+- `LinkControllerTest`：MockMvc 覆盖「统一响应体、匿名可读、401、403、参数校验 400、管理员增删全链路」；
+- `UserServiceTest`：BCrypt 密码存储、JWT 签发、`LOGIN_FAILED` / `USER_NOT_FOUND` 业务异常码。
 
 ```bash
 cd AcgData
-./gradlew bootRun     # 启动（Windows: .\gradlew.bat bootRun）
-./gradlew test        # 单元测试
-./gradlew build       # 打包
+./gradlew test     # Windows: .\gradlew.bat test
 ```
 
 ---
 
-## Acg_admin · 后台管理系统
+## 前台 / 后台
 
-应用本体位于 `Acg_admin/Acg_admin/`（外层 `Acg_admin/package.json` 只声明了 `echarts`、`vue-echarts`，是残留文件，不影响运行）。
+### 前台（AcgWeb）
 
-### 路由
+页面路由：`/home` 首页、`/anime/:id` 番剧详情、`/anime/add`、`/anime/edit/:id`、`/articles/index/:id` 文章详情、
+`/article/add`、`/video/:id`、`/video/add`、`/weekly/:id`、`/discuss`、`/share`、`/search`、`/login`。
 
-| 路径 | 说明 |
-| --- | --- |
-| `/login` | 登录页（`requiresAuth: false`） |
-| `/` | 后台首页（`Layout` 布局内） |
-| `/anime/list` · `/anime/add` · `/anime/edit/:id` | 番剧管理 |
-| `/article/list` · `/article/add` · `/article/edit/:id` | 文章管理 |
-| `/video/list` · `/video/add` · `/video/edit/:id` | 视频管理 |
-| `/user/list` · `/user/edit/:id` | 用户管理 |
+- 首页由轮播、最新番剧、即将上线、随机推荐、最新视频、最新文章、最新动态、周报、角色生日、编辑动态、公告、友链等区块组件拼装；
+- `src/api/index.ts` 里封装了 Axios 单例：自动注入 `Authorization: Bearer <token>`、
+  请求去重取消（`AxiosCanceler`）、**统一解包后端 `Result`（业务失败直接 reject，只把 `data` 交给页面）**、
+  401 清登录态跳登录页、403/404/500 给出提示；
+- 业务接口按 `modules/<模块>/{index,interface,urls.const}.ts` 三文件组织，全量 TypeScript 类型约束；
+- 路由用 `import.meta.glob('./modules/*.ts')` 自动注册，`meta.keepAlive` 生成缓存列表；
+- Pinia `user` store 持久化 token 与用户信息到 localStorage。
 
-`router/index.ts` 的 `beforeEach` 守卫：需要登录的页面没有 `localStorage.token` 就跳 `/login`；已登录再访问 `/login` 则跳回首页。
+### 后台（Acg_admin）
 
-`src/api/axios.ts` 独立创建了一个 axios 实例，`baseURL` 写死为 `http://localhost:8080/api`，同样注入 Bearer token，401 时清空 `token` / `user` 并跳登录。
-
-### 常用脚本
-
-```bash
-cd Acg_admin/Acg_admin
-npm run dev        # 开发
-npm run build      # 类型检查 + 构建
-npm run preview    # 预览产物
-npm run test:unit  # Vitest
-```
+`/login` 登录（调用真实后端，校验 `isAdmin`）、`/` 首页、`anime|article|video|user` 的 list / add / edit 页面；
+路由守卫基于 `localStorage.token`，请求带 Bearer Token，401 自动清理并跳登录。
 
 ---
 
-## 鉴权流程
+## 已知限制与后续优化
 
-1. 前台 / 后台在登录页调用 `POST /api/user/login`；
-2. 后端校验内存里的用户名密码，返回 `{ success, message, user }`；
-3. 前端把用户信息写入 Pinia 与 `localStorage`（前台额外生成一个占位 token：`user_token_<id>`）；
-4. 之后所有请求由拦截器带上 `Authorization: Bearer <token>`；收到 401 就清空登录态并跳转登录页。
-
----
-
-## 已知限制 / 待办
-
-- [ ] 后端无数据库、无真实鉴权（token 由前端生成，接口未校验），生产环境不可直接使用；
-- [ ] `AcgWeb/src/api/modules` 中部分模块只有类型与地址常量，尚未全部接到页面；
-- [ ] 后台 `axios.baseURL` 是硬编码的，建议与前台统一走 `.env`；
-- [ ] `Acg_admin` 目录多套了一层，且外层 `package.json` 与 `node_modules` 属于历史残留，建议整理；
-- [ ] 补充真实图片资源与生产部署配置（`dist` 不提交）。
+- [x] ~~内存假数据~~ → 已全部落库；演示数据与真实数据在同一批表里，生产环境建议引入 **Flyway/Liquibase** 管理迁移；
+- [ ] **缓存**：首页首屏要打十几个接口，建议引入 Redis 缓存首页聚合结果、点赞去重、浏览量计数；
+- [ ] **搜索**：目前是 `LIKE` 模糊匹配，数据量上来后建议换 Elasticsearch；
+- [ ] **文件上传**：图片目前用外链图床，可补 OSS/本地存储 + 静态资源映射；
+- [ ] **Token 刷新**：单 access token（12h），可补 refresh token 与登出黑名单；
+- [ ] **前端体积**：Vite 构建有 >500KB 的 chunk 警告，可按路由做 `manualChunks` 分包；
+- [ ] `Acg_admin` 目录多套了一层（`Acg_admin/Acg_admin/`），建议拍平；
+- [ ] 表名 `character` 是 MySQL 保留字，实体上需用 `@TableName("`character`")` 反引号包住；
+  同时因为实体类名与 `java.lang.Character` 撞名，MyBatis 不能开启 `type-aliases-package`（已去掉）。
+  建议后续把实体改名为 `AnimeCharacter`、表名改名为 `anime_character`，彻底绕开这两个坑。
 
 ---
 
 ## 提交约定
 
-- `.gitignore` 已忽略 `node_modules`、`dist`、`coverage`、`.env` 等目录 / 文件（未加 `/` 前缀，因此对所有子目录生效）；
-- **`.env` 被忽略**：克隆后请按上面的环境变量说明自行创建；
-- 提交前请确认 `AcgWeb`、`Acg_admin/Acg_admin`、`AcgData` 三个目录都是**普通目录**而不是 Git 子模块（仓库文件列表中不应出现带箭头的灰色文件夹图标）。
+- `.gitignore` 已忽略 `node_modules`、`dist`、`coverage`、`.env`（未加 `/` 前缀，对所有子目录生效）；
+- `.env` 被忽略，克隆后按上面的说明自行创建；
+- 提交前确认 `AcgWeb`、`Acg_admin/Acg_admin`、`AcgData` 都是**普通目录**，不是 Git 子模块。

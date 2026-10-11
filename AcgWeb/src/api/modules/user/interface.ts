@@ -12,7 +12,7 @@ export interface RegisterRequest {
    avatar?: string
 }
 
-// 用户数据（新增 bio 和 level）
+// 用户数据
 export interface UserInfo {
    id: number
    username: string
@@ -22,13 +22,15 @@ export interface UserInfo {
    lastLogin: string
    articleCount: number
    commentCount: number
-   bio: string        // 新增
-   level: number      // 新增
+   bio: string
+   level: number
+   isAdmin?: boolean
 }
 
-// 登录/注册响应
-export interface UserResponse {
-   success: boolean
-   message: string
+// 登录 / 注册响应：后端签发 JWT，前端存入 localStorage 并放进 Authorization 头
+export interface LoginResponse {
+   token: string
+   tokenType: string
+   expiresIn: number
    user: UserInfo
 }

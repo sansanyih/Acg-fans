@@ -158,37 +158,31 @@ const handleSubmit = async () => {
    loading.value = true
    try {
       if (isRegister.value) {
-         const res = await userApi.register({
+         await userApi.register({
             username: form.username,
             password: form.password,
             email: form.email
          })
          
-         if (res.success) {
-            ElMessage.success('注册成功，请登录')
-            isRegister.value = false
-            form.password = ''
-            form.confirmPassword = ''
-         } else {
-            ElMessage.error(res.message || '注册失败')
-         }
+         ElMessage.success('注册成功，请登录')
+         isRegister.value = false
+         form.password = ''
+         form.confirmPassword = ''
       } else {
+         // 接口层已解包统一响应体，这里拿到的就是 { token, tokenType, expiresIn, user }
          const res = await userApi.login({
             username: form.username,
             password: form.password
          })
          
-         if (res.success) {
-            ElMessage.success('登录成功')
-            userStore.login('user_token_' + res.user.id, res.user)
-            
-            const redirect = route.query.redirect as string
-            router.push(redirect || '/home')
-         } else {
-            ElMessage.error(res.message || '登录失败')
-         }
+         ElMessage.success('登录成功')
+         userStore.login(res.token, res.user)
+         
+         const redirect = route.query.redirect as string
+         router.push(redirect || '/home')
       }
    } catch (error: any) {
+      // 业务失败（用户名密码错误、参数校验失败等）会在这里被捕获，error.message 就是后端提示
       ElMessage.error(error?.message || '操作失败，请重试')
    } finally {
       loading.value = false

@@ -1,64 +1,60 @@
 package com.example.acgdata.controller;
 
-import org.springframework.web.bind.annotation.*;
+import com.example.acgdata.common.Result;
+import com.example.acgdata.dto.CarouselSaveDTO;
+import com.example.acgdata.service.CarouselService;
+import com.example.acgdata.vo.CarouselVO;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
+/**
+ * 首页轮播图接口。
+ * 路径与返回结构与旧接口保持一致，只在最外层加了一层 Result。
+ * 列表返回数组，详情返回单个对象（字段只有 id / url / title）。
+ */
 @RestController
 @RequestMapping("/api/carousel")
-@CrossOrigin(origins = "*")
+@RequiredArgsConstructor
+@Validated
 public class CarouselController {
 
-    private List<Map<String, Object>> carouselList = new ArrayList<>();
-
-    public CarouselController() {
-        // 初始化轮播图数据
-        String baseUrl = "https://jsd.onmicrosoft.cn/gh/sansanyih/tuchuang@main/img/";
-        List<Map<String, Object>> initCarousel = Arrays.asList(
-                Map.of("id", 1, "url", baseUrl + "1.png", "title", "轮播图1"),
-                Map.of("id", 2, "url", baseUrl + "2.png", "title", "轮播图2"),
-                Map.of("id", 3, "url", baseUrl + "4.jpg", "title", "轮播图3")
-        );
-        carouselList.addAll(initCarousel);
-    }
+    private final CarouselService carouselService;
 
     @GetMapping("/get")
-    public List<Map<String, Object>> getCarousel() {
-        return carouselList;
+    public Result<List<CarouselVO>> getCarousel() {
+        return Result.ok(carouselService.listAll());
     }
 
     @GetMapping("/get/{id}")
-    public Map<String, Object> getCarouselById(@PathVariable int id) {
-        return carouselList.stream()
-                .filter(item -> (int) item.get("id") == id)
-                .findFirst()
-                .orElse(null);
+    public Result<CarouselVO> getCarouselById(@PathVariable Long id) {
+        return Result.ok(carouselService.getVO(id));
     }
 
     @PostMapping("/insert")
-    public Map<String, Object> addCarousel(@RequestBody Map<String, Object> carouselData) {
-        Map<String, Object> newCarousel = new HashMap<>(carouselData);
-        newCarousel.put("id", carouselList.size() + 1);
-        carouselList.add(newCarousel);
-        return newCarousel;
+    public Result<CarouselVO> insert(@Valid @RequestBody CarouselSaveDTO dto) {
+        return Result.ok("新增成功", carouselService.saveCarousel(dto));
     }
 
     @PutMapping("/update/{id}")
-    public Map<String, Object> updateCarousel(@PathVariable int id, @RequestBody Map<String, Object> carouselData) {
-        for (Map<String, Object> carousel : carouselList) {
-            if ((int) carousel.get("id") == id) {
-                carousel.putAll(carouselData);
-                return carousel;
-            }
-        }
-        return null;
+    public Result<CarouselVO> update(@PathVariable Long id, @Valid @RequestBody CarouselSaveDTO dto) {
+        return Result.ok("修改成功", carouselService.updateCarousel(id, dto));
     }
 
     @DeleteMapping("/delete/{id}")
-    public Map<String, String> deleteCarousel(@PathVariable int id) {
-        Map<String, String> response = new HashMap<>();
-        boolean removed = carouselList.removeIf(carousel -> (int) carousel.get("id") == id);
-        response.put("status", removed ? "success" : "error");
-        return response;
+    public Result<Map<String, String>> delete(@PathVariable Long id) {
+        carouselService.removeCarousel(id);
+        return Result.ok(Map.of("status", "success"));
     }
 }

@@ -1,12 +1,12 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '4.0.0-M1'
+    id 'org.springframework.boot' version '4.1.1'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-description = 'AcgData'
+description = 'AcgData - ACG 内容站后端服务'
 
 java {
     toolchain {
@@ -19,12 +19,47 @@ repositories {
     maven { url 'https://repo.spring.io/milestone' }
 }
 
+ext {
+    mybatisPlusVersion = '3.5.17'
+    jjwtVersion = '0.13.0'
+}
+
 dependencies {
+    // Web + 参数校验
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // 安全：Spring Security + JWT
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+
+    // 持久层：MyBatis-Plus + MySQL
+    implementation "com.baomidou:mybatis-plus-spring-boot4-starter:${mybatisPlusVersion}"
+    implementation "com.baomidou:mybatis-plus-jsqlparser:${mybatisPlusVersion}"
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    // 测试
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // Spring Boot 4 把 MockMvc 的测试自动配置拆到了独立 starter（@AutoConfigureMockMvc 在新包里）
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    // 源码里有中文提示文案，必须显式用 UTF-8 编译，否则在中文 Windows（GBK）下会乱码
+    options.encoding = 'UTF-8'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+    systemProperty 'file.encoding', 'UTF-8'
 }

@@ -26,6 +26,7 @@
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
+import { login } from '../api/user';
 
 const router = useRouter();
 const loginFormRef = ref();
@@ -47,34 +48,32 @@ const loginRules = {
 
 const handleLogin = async () => {
   if (!loginFormRef.value) return;
-  
-  await loginFormRef.value.validate(async (valid: boolean) => {
-    if (valid) {
-      loading.value = true;
-      try {
-        // 模拟登录请求
-        setTimeout(() => {
-          if (loginForm.username === 'admin' && loginForm.password === 'admin123') {
-            // 保存登录状态
-            localStorage.setItem('token', 'mock-token');
-            localStorage.setItem('user', JSON.stringify({
-              id: 1,
-              username: 'admin',
-              isAdmin: true
-            }));
-            ElMessage.success('登录成功');
-            router.push('/');
-          } else {
-            ElMessage.error('用户名或密码错误');
-          }
-          loading.value = false;
-        }, 1000);
-      } catch (error) {
-        ElMessage.error('登录失败，请重试');
-        loading.value = false;
-      }
+
+  const valid = await loginFormRef.value.validate().catch(() => false);
+  if (!valid) return;
+
+  loading.value = true;
+  try {
+    // 调用真实后端：POST /api/user/login，返回 { token, tokenType, expiresIn, user }
+    const res: any = await login({
+      username: loginForm.username,
+      password: loginForm.password
+    });
+
+    if (!res?.user?.isAdmin) {
+      ElMessage.error('该账号不是管理员，无法登录后台');
+      return;
     }
-  });
+
+    localStorage.setItem('token', res.token);
+    localStorage.setItem('user', JSON.stringify(res.user));
+    ElMessage.success('登录成功');
+    router.push('/');
+  } catch (error: any) {
+    ElMessage.error(error?.message || '登录失败，请重试');
+  } finally {
+    loading.value = false;
+  }
 };
 </script>
 

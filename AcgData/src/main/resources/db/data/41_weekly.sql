@@ -1,0 +1,25 @@
+-- ============================================================
+-- 周报种子数据（把旧 WeeklyReportController 里的硬编码假数据原样迁移到表里）
+-- 幂等：显式主键 id + ON DUPLICATE KEY UPDATE，可反复执行。
+-- create_time / update_time 用旧数据的「发布日期 / lastEdit」回填，
+-- 这样前端拿到的 publishDate 与 lastEdit 和旧接口逐字一致。
+-- ============================================================
+INSERT INTO `weekly_report` (`id`, `cover`, `title`, `content`, `summary`, `author`, `author_avatar`,
+                             `publish_date`, `read_count`, `like_count`, `create_time`, `update_time`)
+VALUES (1, 'https://example.com/weekly1.jpg', '2026年第13周周报', '# 2026年第13周（2026-04-06 至 2026-04-12）\n\n## 本周概览\n- 完成了用户登录和注册系统的开发\n- 新增了周报功能\n- 优化了文章系统的用户体验\n\n## 详细内容\n\n### 1. 用户系统\n- 实现了登录接口 `/api/user/login`\n- 实现了注册接口 `/api/user/register`\n- 添加了7个示例用户数据\n- 支持个人简介和等级字段\n\n### 2. 文章系统\n- 优化了卡片页接口，添加了封面和用户头像字段\n- 修复了文章内容中的转义字符问题\n- 完善了评论系统\n\n### 3. 下周计划\n- 实现周报的评论功能\n- 添加周报的点赞和阅读量统计\n- 优化前端页面的响应式设计\n\n## 技术栈\n- Spring Boot 3.0+\n- Java 17\n- RESTful API\n\n## 总结\n本周完成了用户系统的核心功能，为后续的功能扩展打下了基础。下周将继续完善周报系统和前端页面。', '2026年第13周工作周报，包含用户系统和文章系统的开发进展', '系统管理员', 'https://example.com/admin-avatar.jpg', '2026-04-12', 156, 8, '2026-04-12 00:00:00', '2026-04-12 18:00:00'),
+       (2, 'https://example.com/weekly2.jpg', '2026年第12周周报', '# 2026年第12周（2026-03-30 至 2026-04-05）\n\n## 本周概览\n- 完成了文章系统的开发\n- 实现了文章的CRUD操作\n- 添加了评论系统\n\n## 详细内容\n\n### 1. 文章系统\n- 实现了文章列表接口 `/api/article/get`\n- 实现了文章详情接口 `/api/article/get/{id}`\n- 实现了文章添加接口 `/api/article/insert`\n- 实现了文章更新接口 `/api/article/update/{id}`\n- 实现了文章删除接口 `/api/article/delete/{id}`\n\n### 2. 评论系统\n- 实现了评论添加接口 `/api/article/addComment/{id}`\n- 支持评论的回复功能\n- 添加了评论的用户信息显示\n\n### 3. 下周计划\n- 开发用户登录和注册系统\n- 实现周报功能\n- 优化前端页面\n\n## 技术栈\n- Spring Boot 3.0+\n- Java 17\n- RESTful API\n\n## 总结\n本周完成了文章系统的核心功能，为社区提供了内容发布和交流的平台。下周将开发用户系统和周报功能。', '2026年第12周工作周报，包含文章系统和评论系统的开发进展', '系统管理员', 'https://example.com/admin-avatar.jpg', '2026-04-05', 123, 5, '2026-04-05 00:00:00', '2026-04-05 17:30:00'),
+       (3, 'https://example.com/weekly3.jpg', '2026年第11周周报', '# 2026年第11周（2026-03-23 至 2026-03-29）\n\n## 本周概览\n- 完成了动漫数据接口的开发\n- 实现了随机动漫和最新动漫接口\n- 添加了即将上映的动漫数据\n\n## 详细内容\n\n### 1. 动漫系统\n- 实现了随机动漫接口 `/api/anime/get/random`\n- 实现了最新动漫接口 `/api/anime/get/latest`\n- 实现了即将上映动漫接口 `/api/anime/get/upcoming`\n- 添加了多部动漫数据，包括《刀剑神域》等\n\n### 2. 技术优化\n- 修复了日期排序中的null值问题\n- 优化了数据结构和响应格式\n- 提高了接口的稳定性\n\n### 3. 下周计划\n- 开发文章系统\n- 实现评论功能\n- 完善前端页面\n\n## 技术栈\n- Spring Boot 3.0+\n- Java 17\n- RESTful API\n\n## 总结\n本周完成了动漫数据接口的开发，为用户提供了丰富的动漫信息。下周将开发文章系统和评论功能。', '2026年第11周工作周报，包含动漫数据接口的开发进展', '系统管理员', 'https://example.com/admin-avatar.jpg', '2026-03-29', 98, 3, '2026-03-29 00:00:00', '2026-03-29 16:45:00'),
+       (4, 'https://example.com/weekly4.jpg', '2026年第10周周报', '# 2026年第10周（2026-03-16 至 2026-03-22）\n\n## 本周概览\n- 项目初始化\n- 搭建了基础架构\n- 实现了基础的RESTful API\n\n## 详细内容\n\n### 1. 项目初始化\n- 创建了Spring Boot项目\n- 配置了基础依赖\n- 搭建了项目结构\n\n### 2. 基础架构\n- 实现了控制器层\n- 配置了路由\n- 测试了基础接口\n\n### 3. 下周计划\n- 开发动漫数据接口\n- 实现数据模型\n- 完善API文档\n\n## 技术栈\n- Spring Boot 3.0+\n- Java 17\n- RESTful API\n\n## 总结\n本周完成了项目的初始化和基础架构的搭建，为后续的功能开发做好了准备。下周将开始开发动漫数据接口。', '2026年第10周工作周报，包含项目初始化和基础架构搭建', '系统管理员', 'https://example.com/admin-avatar.jpg', '2026-03-22', 76, 2, '2026-03-22 00:00:00', '2026-03-22 15:20:00'),
+       (5, 'https://example.com/weekly5.jpg', '2026年第9周周报', '# 2026年第9周（2026-03-09 至 2026-03-15）\n\n## 本周概览\n- 完成了项目需求分析\n- 制定了开发计划\n- 准备了开发环境\n\n## 详细内容\n\n### 1. 需求分析\n- 分析了用户需求\n- 确定了核心功能\n- 制定了技术方案\n\n### 2. 开发计划\n- 制定了详细的开发计划\n- 分配了开发任务\n- 确定了里程碑\n\n### 3. 下周计划\n- 开始项目初始化\n- 搭建基础架构\n- 实现基础API\n\n## 技术栈\n- Spring Boot 3.0+\n- Java 17\n- RESTful API\n\n## 总结\n本周完成了项目的需求分析和开发计划制定，为后续的开发工作做好了准备。下周将开始项目初始化和基础架构搭建。', '2026年第9周工作周报，包含需求分析和开发计划制定', '系统管理员', 'https://example.com/admin-avatar.jpg', '2026-03-15', 54, 1, '2026-03-15 00:00:00', '2026-03-15 14:15:00'),
+       (6, 'https://example.com/weekly6.jpg', '2026年第8周周报', '# 2026年第8周（2026-03-02 至 2026-03-08）\n\n## 本周概览\n- 项目启动\n- 组建了开发团队\n- 进行了技术选型\n\n## 详细内容\n\n### 1. 项目启动\n- 召开了项目启动会议\n- 明确了项目目标\n- 确定了项目范围\n\n### 2. 团队组建\n- 组建了开发团队\n- 分配了角色和职责\n- 建立了沟通机制\n\n### 3. 技术选型\n- 选择了技术栈\n- 评估了技术方案\n- 确定了开发工具\n\n### 4. 下周计划\n- 进行需求分析\n- 制定开发计划\n- 准备开发环境\n\n## 技术栈\n- Spring Boot 3.0+\n- Java 17\n- RESTful API\n\n## 总结\n本周完成了项目的启动和团队组建，为后续的开发工作奠定了基础。下周将进行需求分析和开发计划制定。', '2026年第8周工作周报，包含项目启动和团队组建', '系统管理员', 'https://example.com/admin-avatar.jpg', '2026-03-08', 32, 0, '2026-03-08 00:00:00', '2026-03-08 13:45:00')
+ON DUPLICATE KEY UPDATE `cover`         = VALUES(`cover`),
+                        `title`         = VALUES(`title`),
+                        `content`       = VALUES(`content`),
+                        `summary`       = VALUES(`summary`),
+                        `author`        = VALUES(`author`),
+                        `author_avatar` = VALUES(`author_avatar`),
+                        `publish_date`  = VALUES(`publish_date`),
+                        `read_count`    = VALUES(`read_count`),
+                        `like_count`    = VALUES(`like_count`),
+                        `create_time`   = VALUES(`create_time`),
+                        `update_time`   = VALUES(`update_time`);

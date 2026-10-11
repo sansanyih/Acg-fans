@@ -1,0 +1,70 @@
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+spring:
+  application:
+    name: AcgData
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # createDatabaseIfNotExist=true：库不存在时自动创建
+    url: jdbc:mysql://localhost:3306/acg_fans?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:123456}
+    hikari:
+      pool-name: AcgHikariPool
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # 建表 + 初始化数据（脚本幂等，可重复启动）
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+      schema-locations: classpath:db/schema/*.sql
+      data-locations: classpath:db/data/*.sql
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: always
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  # 注意：这里刻意**不配置 type-aliases-package**。
+  # 本项目全部使用注解 SQL / MyBatis-Plus 的 BaseMapper，不需要 XML 里的短别名；
+  # 而实体类 Character 会与 MyBatis 内置的 java.lang.Character 别名冲突
+  # （启动报 "The alias 'Character' is already mapped to the value 'java.lang.Character'"）。
+  configuration:
+    map-underscore-to-camel-case: true
+    # SQL 日志走 slf4j，由下面的 logging.level 控制（生产环境调到 info 即可关闭）
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+      # 逻辑删除：所有业务表都有 deleted 字段，删除变成 UPDATE deleted = 1
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# 自定义配置：JWT
+acg:
+  jwt:
+    secret: ${JWT_SECRET:acg-fans-jwt-secret-key-2026-please-change-in-production}
+    expire-minutes: ${JWT_EXPIRE_MINUTES:720}
+    header: Authorization
+    prefix: "Bearer "
+
+logging:
+  level:
+    root: info
+    com.example.acgdata: debug
+    com.example.acgdata.mapper: debug

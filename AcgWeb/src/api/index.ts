@@ -1,4 +1,3 @@
-
 import axios, {
   type AxiosInstance,
   type AxiosRequestConfig,
@@ -7,12 +6,15 @@ import axios, {
 } from 'axios'
 import { AxiosCanceler } from './helper/axiosCancel'
 
-// 通用响应类型
+// 后端统一响应体：{ code, message, data, success }
 export interface ApiResponse<T = any> {
   code: number
   message: string
   data: T
+  success?: boolean
 }
+
+const SUCCESS_CODE = 200
 
 class HttpClient {
   private instance: AxiosInstance
@@ -48,12 +50,20 @@ class HttpClient {
       (error) => Promise.reject(error)
     )
 
-    // 响应拦截器
+    // 响应拦截器：统一解包 Result，业务失败直接 reject，调用方只需 try/catch
     this.instance.interceptors.response.use(
       (response: AxiosResponse) => {
         this.canceler.removePending(response.config)
-        // 直接返回响应数据
-        return response.data
+
+        const body = response.data
+        if (body && typeof body === 'object' && typeof body.code === 'number') {
+          if (body.code === SUCCESS_CODE) {
+            // 只把业务数据交给上层
+            return body.data
+          }
+          return Promise.reject(new Error(body.message || '请求失败'))
+        }
+        return body
       },
       (error) => {
         if (error.config) {
@@ -68,26 +78,34 @@ class HttpClient {
   // HTTP 错误处理
   private handleHttpError(error: any) {
     if (error.response) {
-      const { status } = error.response
+      const { status, data } = error.response
       switch (status) {
         case 401:
+          // 未登录 / token 过期：清空登录态并跳转登录页
           localStorage.removeItem('token')
-          // 跳转到登录页
-          window.location.href = '/login'
+          localStorage.removeItem('userInfo')
+          if (!window.location.pathname.startsWith('/login')) {
+            window.location.href = '/login'
+          }
           break
         case 403:
+          error.message = data?.message || '没有权限执行该操作'
           console.error('没有权限访问')
           break
         case 404:
+          error.message = data?.message || '请求的资源不存在'
           console.error('请求的资源不存在')
           break
         case 500:
+          error.message = data?.message || '服务器错误'
           console.error('服务器错误')
           break
         default:
-          console.error(`请求错误: ${error.message}`)
+          error.message = data?.message || `请求错误: ${error.message}`
+          console.error(error.message)
       }
     } else if (error.request) {
+      error.message = '网络错误，请检查网络连接'
       console.error('网络错误，请检查网络连接')
     }
   }

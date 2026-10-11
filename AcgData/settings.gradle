@@ -1,1 +1,14 @@
+// 说明：部分网络环境下 plugins.gradle.org 不可达，
+// 而 Gradle 插件同样发布在 Maven 中央仓库，因此这里把 Central 放在插件解析的第一位。
+pluginManagement {
+    repositories {
+        maven {
+            url 'https://repo1.maven.org/maven2'
+            allowInsecureProtocol = false
+        }
+        maven { url 'https://repo.spring.io/milestone' }
+        gradlePluginPortal()
+    }
+}
+
 rootProject.name = 'AcgData'
