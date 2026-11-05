@@ -288,14 +288,21 @@ const handleSearch = async () => {
    }
 }
 
+// AI 密钥从环境变量读取（.env 已被 .gitignore 忽略，不会进仓库）
+const DEEPSEEK_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY
+
 const callDeepSeek = async () => {
+   if (!DEEPSEEK_API_KEY) {
+      ElMessage.error('未配置 AI 服务密钥，请在 .env 中设置 VITE_DEEPSEEK_API_KEY')
+      return
+   }
    chatLoading.value = true
    try {
       const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
          method: 'POST',
          headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer sk-78525a25cfc244269efa510c87807ec0'
+            'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
          },
          body: JSON.stringify({
             model: 'deepseek-chat',

@@ -25,5 +25,6 @@ declare interface ViteEnv {
   VITE_DROP_CONSOLE: boolean
   VITE_BUILD_GZIP: boolean
   VITE_REPORT: boolean
+  VITE_DEEPSEEK_API_KEY: string
   // 根据你的 .env 需要继续添加...
 }
